@@ -31,7 +31,7 @@ export default function RegisterPage() {
       options: {
         emailRedirectTo:
           process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${window.location.origin}/dashboard`,
+          `${window.location.origin}/auth/callback`,
       },
     });
 
