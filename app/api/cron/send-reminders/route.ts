@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
+import crypto from "crypto";
+
+function createCompleteToken(reminderId: string): string {
+  const secret = process.env.CRON_SECRET || "fallback-secret";
+  return crypto
+    .createHmac("sha256", secret)
+    .update(reminderId)
+    .digest("hex")
+    .slice(0, 32);
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -113,7 +123,8 @@ export async function GET(req: Request) {
       (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000");
-    const completeUrl = `${baseUrl}/api/reminders/complete?id=${reminder.id}`;
+    const token = createCompleteToken(reminder.id);
+    const completeUrl = `${baseUrl}/reminders/complete/${reminder.id}?token=${token}`;
 
     // Send email via Resend
     try {
