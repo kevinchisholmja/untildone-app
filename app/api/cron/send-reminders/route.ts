@@ -1,16 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
-import crypto from "crypto";
-
-function createCompleteToken(reminderId: string): string {
-  const secret = process.env.CRON_SECRET || "fallback-secret";
-  return crypto
-    .createHmac("sha256", secret)
-    .update(reminderId)
-    .digest("hex")
-    .slice(0, 32);
-}
+import { createCompleteToken } from "@/lib/reminders/tokens";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
