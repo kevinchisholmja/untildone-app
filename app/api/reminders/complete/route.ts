@@ -1,18 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import crypto from "crypto";
-
-function generateToken(reminderId: string): string {
-  const secret = process.env.CRON_SECRET || "fallback-secret";
-  return crypto
-    .createHmac("sha256", secret)
-    .update(reminderId)
-    .digest("hex")
-    .slice(0, 32);
-}
-
-export { generateToken as createCompleteToken };
+import { createCompleteToken } from "@/lib/reminders/tokens";
 
 export async function POST(req: Request) {
   try {
@@ -58,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const expectedToken = generateToken(id);
+    const expectedToken = createCompleteToken(id);
     if (token !== expectedToken) {
       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
