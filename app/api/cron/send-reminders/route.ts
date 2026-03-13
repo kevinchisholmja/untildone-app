@@ -148,8 +148,11 @@ export async function GET(req: Request) {
         reminder.current_interval_days
       );
 
+      // Calculate next_send_at based on the scheduled time, not current time,
+      // to prevent drift when cron processes reminders after their scheduled time
+      const previousScheduledTime = new Date(reminder.next_send_at).getTime();
       const nextSendAt = new Date(
-        Date.now() + newInterval * 24 * 60 * 60 * 1000
+        previousScheduledTime + newInterval * 24 * 60 * 60 * 1000
       ).toISOString();
 
       await supabase
